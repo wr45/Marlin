@@ -539,7 +539,7 @@
  *   !!! Use these for Testing or Development purposes. NEVER for production machine. !!!
  *   998 : Dummy Table that ALWAYS reads 25°C or the temperature defined below.
  *   999 : Dummy Table that ALWAYS reads 100°C or the temperature defined below.
- *
+
  */
 #define TEMP_SENSOR_0 1
 #define TEMP_SENSOR_1 0
@@ -1467,7 +1467,7 @@
  *
  * Tune and Adjust
  * -  Probe Offsets can be tuned at runtime with 'M851', LCD menus, babystepping, etc.
- * -  PROBE_OFFSET_WIZARD (configuration_adv.h) can be used for setting the Z offset.
+ * -  PROBE_OFFSET_WIZARD (Configuration_adv.h) can be used for setting the Z offset.
  *
  * Assuming the typical work area orientation:
  *  - Probe to RIGHT of the Nozzle has a Positive X offset
@@ -1492,6 +1492,12 @@
  *     O-- FRONT --+
  */
 #define NOZZLE_TO_PROBE_OFFSET { 10, 10, 0 }
+
+// Enable and set to use a specific tool for probing. Disable to allow any tool.
+#define PROBING_TOOL 0
+#ifdef PROBING_TOOL
+  //#define PROBE_TOOLCHANGE_NO_MOVE  // Suppress motion on probe tool-change
+#endif
 
 // Most probes should stay away from the edges of the bed, but
 // with NOZZLE_AS_PROBE this can be negative for a wider probing area.
@@ -1708,7 +1714,7 @@
 // Travel limits (linear=mm, rotational=°) after homing, corresponding to endstop positions.
 #define X_MIN_POS -13
 #define Y_MIN_POS -30
-#define Z_MIN_POS -1.6
+#define Z_MIN_POS -4.0
 #define X_MAX_POS X_BED_SIZE
 #define Y_MAX_POS Y_BED_SIZE - 20
 #define Z_MAX_POS 360
@@ -1762,7 +1768,7 @@
   #define MAX_SOFTWARE_ENDSTOP_W
 #endif
 
-#if EITHER(MIN_SOFTWARE_ENDSTOPS, MAX_SOFTWARE_ENDSTOPS)
+#if ANY(MIN_SOFTWARE_ENDSTOPS, MAX_SOFTWARE_ENDSTOPS)
   //#define SOFT_ENDSTOPS_MENU_ITEM  // Enable/Disable software endstops from the LCD
 #endif
 
@@ -1838,6 +1844,47 @@
     // as the filament moves. (Be sure to set FILAMENT_RUNOUT_DISTANCE_MM
     // large enough to avoid false positives.)
     //#define FILAMENT_MOTION_SENSOR
+
+    #if ENABLED(FILAMENT_MOTION_SENSOR)
+      //#define FILAMENT_SWITCH_AND_MOTION
+      #if ENABLED(FILAMENT_SWITCH_AND_MOTION)
+        #define NUM_MOTION_SENSORS   1          // Number of sensors, up to one per extruder. Define a FIL_MOTION#_PIN for each.
+        //#define FIL_MOTION1_PIN    -1
+
+        // Override individually if the motion sensors vary
+        //#define FIL_MOTION1_STATE LOW
+        //#define FIL_MOTION1_PULLUP
+        //#define FIL_MOTION1_PULLDOWN
+
+        //#define FIL_MOTION2_STATE LOW
+        //#define FIL_MOTION2_PULLUP
+        //#define FIL_MOTION2_PULLDOWN
+
+        //#define FIL_MOTION3_STATE LOW
+        //#define FIL_MOTION3_PULLUP
+        //#define FIL_MOTION3_PULLDOWN
+
+        //#define FIL_MOTION4_STATE LOW
+        //#define FIL_MOTION4_PULLUP
+        //#define FIL_MOTION4_PULLDOWN
+
+        //#define FIL_MOTION5_STATE LOW
+        //#define FIL_MOTION5_PULLUP
+        //#define FIL_MOTION5_PULLDOWN
+
+        //#define FIL_MOTION6_STATE LOW
+        //#define FIL_MOTION6_PULLUP
+        //#define FIL_MOTION6_PULLDOWN
+
+        //#define FIL_MOTION7_STATE LOW
+        //#define FIL_MOTION7_PULLUP
+        //#define FIL_MOTION7_PULLDOWN
+
+        //#define FIL_MOTION8_STATE LOW
+        //#define FIL_MOTION8_PULLUP
+        //#define FIL_MOTION8_PULLDOWN
+      #endif
+    #endif
   #endif
 #endif
 
@@ -1890,7 +1937,7 @@
  * these options to restore the prior leveling state or to always enable
  * leveling immediately after G28.
  */
-//#define RESTORE_LEVELING_AFTER_G28
+#define RESTORE_LEVELING_AFTER_G28
 //#define ENABLE_LEVELING_AFTER_G28
 
 /**
@@ -1898,8 +1945,8 @@
  */
 //#define PREHEAT_BEFORE_LEVELING
 #if ENABLED(PREHEAT_BEFORE_LEVELING)
-  #define LEVELING_NOZZLE_TEMP 120   // (°C) Only applies to E0 at this time
-  #define LEVELING_BED_TEMP     50
+  #define LEVELING_NOZZLE_TEMP 222    // (°C) Only applies to E0 at this time
+  #define LEVELING_BED_TEMP     70
 #endif
 
 /**
@@ -1920,7 +1967,7 @@
 
 #if ANY(MESH_BED_LEVELING, AUTO_BED_LEVELING_UBL, PROBE_MANUALLY)
   // Set a height for the start of manual adjustment
-  #define MANUAL_PROBE_START_Z 0.2  // (mm) Comment out to use the last-measured height
+  #define MANUAL_PROBE_START_Z 0.1  // (mm) Comment out to use the last-measured height
 #endif
 
 #if ANY(MESH_BED_LEVELING, AUTO_BED_LEVELING_BILINEAR, AUTO_BED_LEVELING_UBL)
@@ -2021,16 +2068,16 @@
  * Add a bed leveling sub-menu for ABL or MBL.
  * Include a guided procedure if manual probing is enabled.
  */
-//#define LCD_BED_LEVELING
+#define LCD_BED_LEVELING
 
 #if ENABLED(LCD_BED_LEVELING)
   #define MESH_EDIT_Z_STEP  0.025 // (mm) Step size while manually probing Z axis.
   #define LCD_PROBE_Z_RANGE 4     // (mm) Z Range centered on Z_MIN_POS for LCD Z adjustment
-  //#define MESH_EDIT_MENU        // Add a menu to edit mesh points
+  #define MESH_EDIT_MENU        // Add a menu to edit mesh points
 #endif
 
 // Add a menu item to move between bed corners for manual bed adjustment
-//#define LCD_BED_TRAMMING
+#define LCD_BED_TRAMMING
 
 #if ENABLED(LCD_BED_TRAMMING)
   #define BED_TRAMMING_INSET_LFRB { 30, 30, 30, 30 } // (mm) Left, Front, Right, Back insets
@@ -2225,9 +2272,9 @@
 #define PREHEAT_1_FAN_SPEED     0 // Value from 0 to 255
 
 #define PREHEAT_2_LABEL       "PLA"
-#define PREHEAT_2_TEMP_HOTEND 180
-#define PREHEAT_2_TEMP_BED     70
-#define PREHEAT_2_TEMP_CHAMBER 35
+#define PREHEAT_2_TEMP_HOTEND 205 
+#define PREHEAT_2_TEMP_BED     55
+#define PREHEAT_2_TEMP_CHAMBER 0
 #define PREHEAT_2_FAN_SPEED     0 // Value from 0 to 255
 
 #define PREHEAT_3_LABEL       "ABS"
@@ -2261,7 +2308,7 @@
 #endif
 
 /**
- * Clean Nozzle Feature -- EXPERIMENTAL
+ * Clean Nozzle Feature
  *
  * Adds the G12 command to perform a nozzle cleaning process.
  *
@@ -2704,7 +2751,7 @@
 //
 
 //
-// 2-wire Non-latching LCD SR from https://goo.gl/aJJ4sH
+// 2-wire Non-latching LCD SR from https://github.com/fmalpartida/New-LiquidCrystal/wiki/schematics#user-content-ShiftRegister_connection
 // LCD configuration: https://reprap.org/wiki/SAV_3D_LCD
 //
 //#define SAV_3DLCD
@@ -2962,10 +3009,12 @@
  * ORIGIN (Marlin DWIN_SET)
  *  - Download https://github.com/coldtobi/Marlin_DGUS_Resources
  *  - Copy the downloaded DWIN_SET folder to the SD card.
+ *  - Product: https://www.aliexpress.com/item/32993409517.html
  *
  * FYSETC (Supplier default)
  *  - Download https://github.com/FYSETC/FYSTLCD-2.0
  *  - Copy the downloaded SCREEN folder to the SD card.
+ *  - Product: https://www.aliexpress.com/item/32961471929.html
  *
  * HIPRECY (Supplier default)
  *  - Download https://github.com/HiPrecy/Touch-Lcd-LEO
@@ -2974,6 +3023,7 @@
  * MKS (MKS-H43) (Supplier default)
  *  - Download https://github.com/makerbase-mks/MKS-H43
  *  - Copy the downloaded DWIN_SET folder to the SD card.
+ *  - Product: https://www.aliexpress.com/item/1005002008179262.html
  *
  * RELOADED (T5UID1)
  *  - Download https://github.com/Desuuuu/DGUS-reloaded/releases
